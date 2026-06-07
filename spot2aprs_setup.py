@@ -11,13 +11,19 @@ interval, symbol, comment) and saves them to ~/.spot2aprs.json.
 Then it runs continuously, polling the SPOT API and uploading to APRS-IS
 on your chosen interval. Press Ctrl-C to stop.
 
-Run with --reset to re-enter all settings.
+    --reset            Re-enter all settings
+    --install-service  Install as a persistent background service
+                       (systemd on Linux, launchd on macOS)
+    --uninstall-service  Remove the service
+    --once             Run once and exit
+    --verbose          Extra output
 """
 
 import sys
 import os
 import json
 import socket
+import platform
 import time
 import datetime
 import argparse
@@ -281,16 +287,166 @@ def run_once(requests_mod, cfg, verbose=False):
         print(f"  ERROR uploading to APRS-IS: {e}")
 
 
+# ── Service install / uninstall ───────────────────────────────────────────────
+
+SYSTEMD_SERVICE = """\
+[Unit]
+Description=SPOT to APRS-IS uploader
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart={python} {script}
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
+"""
+
+LAUNCHD_PLIST = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>io.github.spot2aprs</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{python}</string>
+        <string>{script}</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>{logfile}</string>
+    <key>StandardErrorPath</key>
+    <string>{logfile}</string>
+</dict>
+</plist>
+"""
+
+
+def install_service():
+    script = os.path.abspath(__file__)
+    python = sys.executable
+    system = platform.system()
+
+    if system == "Linux":
+        service_dir = os.path.expanduser("~/.config/systemd/user")
+        service_file = os.path.join(service_dir, "spot2aprs.service")
+        os.makedirs(service_dir, exist_ok=True)
+
+        with open(service_file, "w") as f:
+            f.write(SYSTEMD_SERVICE.format(python=python, script=script))
+        print(f"Wrote service file: {service_file}")
+
+        cmds = [
+            ["systemctl", "--user", "daemon-reload"],
+            ["systemctl", "--user", "enable", "spot2aprs"],
+            ["systemctl", "--user", "start",  "spot2aprs"],
+            ["loginctl", "enable-linger", os.environ.get("USER", "")],
+        ]
+        for cmd in cmds:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            label = " ".join(cmd)
+            if result.returncode == 0:
+                print(f"  ✓ {label}")
+            else:
+                print(f"  ✗ {label}")
+                if result.stderr:
+                    print(f"    {result.stderr.strip()}")
+
+        print()
+        print("Service installed and started.")
+        print("  Status:  systemctl --user status spot2aprs")
+        print("  Logs:    journalctl --user -u spot2aprs -f")
+        print("  Stop:    systemctl --user stop spot2aprs")
+
+    elif system == "Darwin":
+        plist_dir  = os.path.expanduser("~/Library/LaunchAgents")
+        plist_file = os.path.join(plist_dir, "io.github.spot2aprs.plist")
+        logfile    = os.path.expanduser("~/Library/Logs/spot2aprs.log")
+        os.makedirs(plist_dir, exist_ok=True)
+
+        with open(plist_file, "w") as f:
+            f.write(LAUNCHD_PLIST.format(python=python, script=script, logfile=logfile))
+        print(f"Wrote plist: {plist_file}")
+
+        result = subprocess.run(
+            ["launchctl", "load", "-w", plist_file],
+            capture_output=True, text=True
+        )
+        if result.returncode == 0:
+            print("  ✓ launchctl load")
+        else:
+            print(f"  ✗ launchctl load: {result.stderr.strip()}")
+
+        print()
+        print("Service installed and started.")
+        print(f"  Logs:    tail -f {logfile}")
+        print(f"  Stop:    launchctl unload {plist_file}")
+
+    else:
+        print(f"Unsupported OS: {system}")
+        print("Please set up a service manually to run:")
+        print(f"  {python} {script}")
+        sys.exit(1)
+
+
+def uninstall_service():
+    system = platform.system()
+
+    if system == "Linux":
+        cmds = [
+            ["systemctl", "--user", "stop",    "spot2aprs"],
+            ["systemctl", "--user", "disable", "spot2aprs"],
+        ]
+        for cmd in cmds:
+            subprocess.run(cmd, capture_output=True)
+            print(f"  ✓ {' '.join(cmd)}")
+
+        service_file = os.path.expanduser("~/.config/systemd/user/spot2aprs.service")
+        if os.path.exists(service_file):
+            os.remove(service_file)
+            print(f"  ✓ Removed {service_file}")
+
+        subprocess.run(["systemctl", "--user", "daemon-reload"], capture_output=True)
+        print("Service removed.")
+
+    elif system == "Darwin":
+        plist_file = os.path.expanduser("~/Library/LaunchAgents/io.github.spot2aprs.plist")
+        if os.path.exists(plist_file):
+            subprocess.run(["launchctl", "unload", "-w", plist_file], capture_output=True)
+            os.remove(plist_file)
+            print(f"  ✓ Removed {plist_file}")
+        print("Service removed.")
+
+    else:
+        print(f"Unsupported OS: {system}")
+
+
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
         description="Poll SPOT API and upload positions to APRS-IS continuously."
     )
-    parser.add_argument("--reset",   action="store_true", help="Re-enter all settings.")
-    parser.add_argument("--once",    action="store_true", help="Run once and exit.")
-    parser.add_argument("--verbose", action="store_true", help="Extra output.")
+    parser.add_argument("--reset",             action="store_true", help="Re-enter all settings.")
+    parser.add_argument("--once",              action="store_true", help="Run once and exit.")
+    parser.add_argument("--verbose",           action="store_true", help="Extra output.")
+    parser.add_argument("--install-service",   action="store_true", help="Install as a persistent background service.")
+    parser.add_argument("--uninstall-service", action="store_true", help="Remove the background service.")
     args = parser.parse_args()
+
+    if args.uninstall_service:
+        uninstall_service()
+        return
 
     requests_mod = ensure_requests()
 
@@ -302,6 +458,11 @@ def main():
         cfg = setup_wizard(cfg)
     else:
         print(f"Loaded config from {CONFIG_FILE}  (--reset to change settings)")
+
+    if args.install_service:
+        print()
+        install_service()
+        return
 
     interval_sec = int(cfg.get("interval", 10)) * 60
 
