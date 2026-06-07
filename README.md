@@ -47,11 +47,21 @@ sudo apt install python3
 
 ### Step 1 — Download the script
 
-1. Go to this page: [https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py](https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py)
-2. Click the **Download raw file** button (the downward arrow icon near the top right of the file viewer)
-3. Save the file somewhere easy to find — your Desktop or Downloads folder is fine
+**Easiest method — right-click to save:**
 
-> **Windows users:** your browser may save it as `spot2aprs_setup.py.txt`. If that happens, rename it and remove the `.txt` so the filename ends in `.py` only.
+Right-click this link and choose **Save link as...** (Chrome/Edge) or **Save target as...** (Firefox):
+
+[Right-click here → Save link as... → spot2aprs_setup.py](https://raw.githubusercontent.com/jjkroell/spot2aprs/master/spot2aprs_setup.py)
+
+Save it somewhere easy to find — your Desktop or Downloads folder is fine.
+
+> **Windows users:** your browser may save it as `spot2aprs_setup.py.txt`. If that happens, rename the file and remove the `.txt` so the filename ends in `.py` only.
+
+**Alternative — GitHub file viewer:**
+
+1. Go to [https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py](https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py)
+2. Click the **Download raw file** button (downward arrow icon, top right of the file viewer)
+3. Save to your Desktop or Downloads folder
 
 ### Step 2 — Open a terminal
 
