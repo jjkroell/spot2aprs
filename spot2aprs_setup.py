@@ -30,7 +30,9 @@ import argparse
 import getpass
 import subprocess
 
-CONFIG_FILE = os.path.expanduser("~/.spot2aprs.json")
+CONFIG_FILE  = os.path.expanduser("~/.spot2aprs.json")
+LOG_FILE     = os.path.expanduser("~/.spot2aprs_log.json")
+LOG_MAX      = 24
 
 SPOT_API_URL = (
     "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed"
@@ -233,16 +235,63 @@ def setup_wizard(cfg):
     return cfg
 
 
+# ── Poll log ─────────────────────────────────────────────────────────────────
+
+def log_append(entry: dict):
+    """Append a poll result to the log, keeping only the last LOG_MAX entries."""
+    try:
+        if os.path.exists(LOG_FILE):
+            with open(LOG_FILE) as f:
+                entries = json.load(f)
+        else:
+            entries = []
+    except Exception:
+        entries = []
+
+    entries.append(entry)
+    entries = entries[-LOG_MAX:]  # trim to last 24
+
+    with open(LOG_FILE, "w") as f:
+        json.dump(entries, f, indent=2)
+
+
+def log_print():
+    """Print the poll history in a readable table."""
+    if not os.path.exists(LOG_FILE):
+        print("No log entries yet.")
+        return
+    with open(LOG_FILE) as f:
+        entries = json.load(f)
+    if not entries:
+        print("No log entries yet.")
+        return
+
+    print(f"\n{'#':<4} {'Polled (UTC)':<22} {'Lat':>10} {'Lon':>11} {'Age':>6} {'Status'}")
+    print("─" * 75)
+    for i, e in enumerate(entries, 1):
+        lat    = f"{e.get('lat', 0):10.5f}" if e.get('lat') is not None else " " * 10
+        lon    = f"{e.get('lon', 0):11.5f}" if e.get('lon') is not None else " " * 11
+        age    = f"{e.get('age_min', '?'):>5}m"
+        status = e.get("status", "?")
+        polled = e.get("polled_at", "")[:19]
+        print(f"{i:<4} {polled:<22} {lat} {lon} {age}  {status}")
+    print()
+
+
 # ── Single poll cycle ─────────────────────────────────────────────────────────
 
 def run_once(requests_mod, cfg, verbose=False):
-    now = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"\n[{now} UTC] Polling SPOT…")
+    polled_at = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\n[{polled_at} UTC] Polling SPOT…")
+
+    log_entry = {"polled_at": polled_at, "lat": None, "lon": None, "age_min": None, "status": "error"}
 
     try:
         msg = fetch_spot(requests_mod, cfg["spot_feed_id"], verbose=verbose)
     except Exception as e:
         print(f"  ERROR fetching SPOT: {e}")
+        log_entry["status"] = f"fetch_error: {e}"
+        log_append(log_entry)
         return
 
     age = message_age_minutes(msg)
@@ -260,11 +309,16 @@ def run_once(requests_mod, cfg, verbose=False):
         + (f" {cfg['comment']}" if cfg.get("comment") else "")
     ).strip()
 
+    log_entry.update({"lat": lat, "lon": lon, "alt_m": alt, "age_min": age,
+                      "comment": comment, "spot_time": msg.get("dateTime", "")})
+
     print(f"  Position : {lat:.5f}, {lon:.5f}  alt {alt:.0f}m  ({age} min ago)")
     print(f"  Comment  : {comment}")
 
     if age > int(cfg.get("maxage", 60)):
         print(f"  Skipping — position is {age} min old (max {cfg['maxage']} min).")
+        log_entry["status"] = f"skipped (too old: {age} min)"
+        log_append(log_entry)
         return
 
     packet = build_packet(
@@ -283,8 +337,13 @@ def run_once(requests_mod, cfg, verbose=False):
     try:
         aprsis_send(cfg["callsign"], int(cfg["aprs_passcode"]), packet, verbose=verbose)
         print(f"  Uploaded to APRS-IS ✓")
+        log_entry["status"] = "uploaded"
+        log_entry["packet"] = packet
     except Exception as e:
         print(f"  ERROR uploading to APRS-IS: {e}")
+        log_entry["status"] = f"aprs_error: {e}"
+
+    log_append(log_entry)
 
 
 # ── Service install / uninstall ───────────────────────────────────────────────
@@ -440,12 +499,17 @@ def main():
     parser.add_argument("--reset",             action="store_true", help="Re-enter all settings.")
     parser.add_argument("--once",              action="store_true", help="Run once and exit.")
     parser.add_argument("--verbose",           action="store_true", help="Extra output.")
+    parser.add_argument("--log",               action="store_true", help="Print poll history and exit.")
     parser.add_argument("--install-service",   action="store_true", help="Install as a persistent background service.")
     parser.add_argument("--uninstall-service", action="store_true", help="Remove the background service.")
     args = parser.parse_args()
 
     if args.uninstall_service:
         uninstall_service()
+        return
+
+    if args.log:
+        log_print()
         return
 
     requests_mod = ensure_requests()
