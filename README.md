@@ -104,7 +104,7 @@ python3 spot2aprs_setup.py
 python spot2aprs_setup.py
 ```
 
-The first time you run it, the **setup wizard** will launch automatically. You only need to do this once — your answers are saved for all future runs.
+The first time you run it, the **setup wizard** will launch automatically. You only need to do this once — your answers are saved for all future runs. For optional flags you can use after setup, see [Command-line flags](#command-line-flags).
 
 ---
 
