@@ -47,24 +47,49 @@ sudo apt install python3
 
 ### Step 1 — Download the script
 
-**Option A — with git:**
+1. Go to this page: [https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py](https://github.com/jjkroell/spot2aprs/blob/master/spot2aprs_setup.py)
+2. Click the **Download raw file** button (the downward arrow icon near the top right of the file viewer)
+3. Save the file somewhere easy to find — your Desktop or Downloads folder is fine
+
+> **Windows users:** your browser may save it as `spot2aprs_setup.py.txt`. If that happens, rename it and remove the `.txt` so the filename ends in `.py` only.
+
+### Step 2 — Open a terminal
+
+A terminal is a text-based window where you type commands. You need one to run the script.
+
+**Windows:** Press `Windows key + R`, type `cmd`, press Enter. A black window will open — this is the Command Prompt.
+
+**macOS:** Press `Command + Space`, type `Terminal`, press Enter.
+
+**Linux:** Press `Ctrl + Alt + T`, or search for "Terminal" in your application menu.
+
+### Step 3 — Navigate to where you saved the script
+
+In your terminal, type `cd` followed by the folder where you saved the file. For example:
+
+**Windows (saved to Desktop):**
 ```
-git clone https://github.com/jjkroell/spot2aprs.git
-cd spot2aprs
+cd %USERPROFILE%\Desktop
 ```
 
-**Option B — direct download:**
-Download `spot2aprs_setup.py` from this repository and save it somewhere easy to find, such as your home folder or Desktop.
+**macOS/Linux (saved to Desktop):**
+```
+cd ~/Desktop
+```
 
-### Step 2 — Run it
+**macOS/Linux (saved to Downloads):**
+```
+cd ~/Downloads
+```
 
-Open a terminal (or Command Prompt on Windows) and run:
+### Step 4 — Run it
 
+**macOS or Linux:**
 ```
 python3 spot2aprs_setup.py
 ```
 
-On Windows you may need to use `python` instead of `python3`:
+**Windows:**
 ```
 python spot2aprs_setup.py
 ```
