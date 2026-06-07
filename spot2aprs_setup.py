@@ -451,6 +451,33 @@ def install_service():
         print(f"  Logs:    tail -f {logfile}")
         print(f"  Stop:    launchctl unload {plist_file}")
 
+    elif system == "Windows":
+        bat_file = os.path.expanduser("~/spot2aprs_service.bat")
+        logfile  = os.path.expanduser("~/spot2aprs_service.log")
+        with open(bat_file, "w") as f:
+            f.write(f'@echo off\n"{python}" "{script}" >> "{logfile}" 2>&1\n')
+        print(f"Wrote launcher: {bat_file}")
+
+        cmds = [
+            ["schtasks", "/create", "/tn", "spot2aprs", "/tr", bat_file, "/sc", "ONLOGON", "/f"],
+            ["schtasks", "/run",    "/tn", "spot2aprs"],
+        ]
+        for cmd in cmds:
+            result = subprocess.run(cmd, capture_output=True, text=True)
+            label  = " ".join(cmd)
+            if result.returncode == 0:
+                print(f"  ✓ {label}")
+            else:
+                print(f"  ✗ {label}")
+                if result.stderr:
+                    print(f"    {result.stderr.strip()}")
+
+        print()
+        print("Service installed and started.")
+        print(f'  Status:  schtasks /query /tn "spot2aprs"')
+        print(f"  Logs:    type {logfile}")
+        print(f'  Stop:    schtasks /end /tn "spot2aprs"')
+
     else:
         print(f"Unsupported OS: {system}")
         print("Please set up a service manually to run:")
@@ -486,6 +513,21 @@ def uninstall_service():
             print(f"  ✓ Removed {plist_file}")
         print("Service removed.")
 
+    elif system == "Windows":
+        cmds = [
+            ["schtasks", "/end",    "/tn", "spot2aprs"],
+            ["schtasks", "/delete", "/tn", "spot2aprs", "/f"],
+        ]
+        for cmd in cmds:
+            subprocess.run(cmd, capture_output=True)
+            print(f"  ✓ {' '.join(cmd)}")
+
+        bat_file = os.path.expanduser("~/spot2aprs_service.bat")
+        if os.path.exists(bat_file):
+            os.remove(bat_file)
+            print(f"  ✓ Removed {bat_file}")
+        print("Service removed.")
+
     else:
         print(f"Unsupported OS: {system}")
 
@@ -515,11 +557,13 @@ def main():
     requests_mod = ensure_requests()
 
     cfg = {} if args.reset else load_config()
+    needs_setup = not cfg.get("spot_feed_id") or not cfg.get("callsign") or args.reset
 
-    if not cfg.get("spot_feed_id") or not cfg.get("callsign"):
+    if needs_setup:
         cfg = setup_wizard(cfg)
-    elif args.reset:
-        cfg = setup_wizard(cfg)
+        print()
+        install_service()
+        return
     else:
         print(f"Loaded config from {CONFIG_FILE}  (--reset to change settings)")
 

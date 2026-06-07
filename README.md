@@ -217,23 +217,32 @@ After the last question the script saves your settings and prints:
 Settings saved to /home/yourname/.spot2aprs.json
 ```
 
-It then immediately starts running:
+It then automatically installs a background service so the script keeps running even after you close the terminal and restarts itself after every reboot. You will see something like this (exact output depends on your operating system):
 
+**Linux:**
 ```
-Running — polling every 10 minutes.  Press Ctrl-C to stop.
-Callsign : VE7XX-9
-Feed ID  : 0onlL1MpojDLSzlNpNYRMHuqcMkIl1234
-
-[2026-06-07 20:00:00 UTC] Polling SPOT…
-  Position : 49.25431, -123.12345  alt 12m  (4 min ago)
-  Comment  : MyName SPOT4 OK Batt:GOOD Pacific Coast trip
-  Uploaded to APRS-IS ✓
-  Next poll at 20:10:00 UTC
+Service installed and started.
+  Status:  systemctl --user status spot2aprs
+  Logs:    journalctl --user -u spot2aprs -f
+  Stop:    systemctl --user stop spot2aprs
 ```
 
-Your position is now live on [aprs.fi](https://aprs.fi) — search for your callsign.
+**macOS:**
+```
+Service installed and started.
+  Logs:    tail -f ~/Library/Logs/spot2aprs.log
+  Stop:    launchctl unload ~/Library/LaunchAgents/io.github.spot2aprs.plist
+```
 
-Press **Ctrl-C** at any time to stop the script.
+**Windows:**
+```
+Service installed and started.
+  Status:  schtasks /query /tn "spot2aprs"
+  Logs:    type C:\Users\yourname\spot2aprs_service.log
+  Stop:    schtasks /end /tn "spot2aprs"
+```
+
+You can now close the terminal. The script is running in the background and will continue uploading your position every X minutes. Your position is now live on [aprs.fi](https://aprs.fi) — search for your callsign.
 
 ---
 
@@ -360,15 +369,13 @@ The log keeps the last **24 entries** automatically. Once it reaches 24, the old
 
 ### `--install-service`
 
-Install the script as a persistent background service that starts automatically at boot. You only need to run this once.
+Install (or reinstall) the background service manually. Under normal use you do not need this flag — the service is installed automatically the first time you run setup. Use this flag only if you previously uninstalled the service and want to reinstall it without re-running the full setup wizard.
 
 ```
 python3 spot2aprs_setup.py --install-service
 ```
 
-> Run setup (`python3 spot2aprs_setup.py`) and confirm it is working correctly **before** installing the service. The service runs from your saved config file, so the config must exist first.
-
-**On Linux** the script creates a systemd user service. After installation it prints:
+**On Linux** the script creates a systemd user service:
 
 ```
 Service installed and started.
@@ -377,7 +384,7 @@ Service installed and started.
   Stop:    systemctl --user stop spot2aprs
 ```
 
-**On macOS** the script creates a launchd agent in `~/Library/LaunchAgents/`. After installation it prints:
+**On macOS** the script creates a launchd agent in `~/Library/LaunchAgents/`:
 
 ```
 Service installed and started.
@@ -385,7 +392,16 @@ Service installed and started.
   Stop:    launchctl unload ~/Library/LaunchAgents/io.github.spot2aprs.plist
 ```
 
-Once installed the service runs silently in the background. It will restart itself automatically if it crashes, and it will start again after every reboot without any action from you.
+**On Windows** the script writes a small launcher file (`~/spot2aprs_service.bat`) and registers it as a Task Scheduler task that runs at logon:
+
+```
+Service installed and started.
+  Status:  schtasks /query /tn "spot2aprs"
+  Logs:    type C:\Users\yourname\spot2aprs_service.log
+  Stop:    schtasks /end /tn "spot2aprs"
+```
+
+On all platforms the service runs silently in the background. It will start again after every reboot without any action from you.
 
 ---
 
@@ -436,6 +452,20 @@ journalctl --user -u spot2aprs -n 50
 tail -f ~/Library/Logs/spot2aprs.log
 ```
 
+**Windows (Task Scheduler):**
+```
+# Check task status in Command Prompt
+schtasks /query /tn "spot2aprs"
+
+# View the log file in Notepad
+notepad %USERPROFILE%\spot2aprs_service.log
+
+# Or print it in Command Prompt
+type %USERPROFILE%\spot2aprs_service.log
+```
+
+On any platform you can also run `python3 spot2aprs_setup.py --log` to see a formatted summary of the last 24 poll results regardless of how the service is running.
+
 ---
 
 ## Updating your settings
@@ -446,7 +476,7 @@ To change any setting (Feed ID, callsign, interval, symbol, etc.) run:
 python3 spot2aprs_setup.py --reset
 ```
 
-If you have the service installed, restart it after changing settings:
+Running `--reset` also reinstalls the service automatically with the new settings, so you do not need to do anything extra. If you need to restart the service manually:
 
 **Linux:**
 ```
@@ -457,6 +487,12 @@ systemctl --user restart spot2aprs
 ```
 launchctl unload ~/Library/LaunchAgents/io.github.spot2aprs.plist
 launchctl load -w ~/Library/LaunchAgents/io.github.spot2aprs.plist
+```
+
+**Windows:**
+```
+schtasks /end /tn "spot2aprs"
+schtasks /run /tn "spot2aprs"
 ```
 
 ---
