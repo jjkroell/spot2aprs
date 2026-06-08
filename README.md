@@ -24,7 +24,7 @@ This is a unique ID that identifies your device's public data feed. To find it:
 You need a valid amateur radio (ham radio) licence and callsign to transmit on APRS-IS. You cannot use APRS-IS without one. If you are a licensed amateur operator, your callsign will look like `VE7XX`, `W1ABC`, `KD9XYZ`, etc.
 
 ### 4. Your APRS-IS passcode
-The passcode is a number derived from your callsign that proves you are the owner of it. You only need to calculate it once. Visit **[aprs.do/passcode](https://aprs.do/passcode)**, enter your callsign, and it will show your passcode (a 4–5 digit number). Write it down.
+The passcode is a number derived from your callsign that proves you are the owner of it. You only need to calculate it once. Visit **[apps.magicbug.co.uk/passcode](https://apps.magicbug.co.uk/passcode/)**, enter your callsign, and it will show your passcode (a 4–5 digit number). Write it down.
 
 ### 5. Python 3.7 or newer
 
@@ -150,10 +150,10 @@ Enter your amateur radio callsign followed by an **SSID** (Secondary Station Ide
 ---
 
 ```
-APRS-IS passcode  (aprs.do/passcode):
+APRS-IS passcode  (apps.magicbug.co.uk/passcode):
 ```
 
-Enter your APRS-IS passcode — the 4–5 digit number you calculated from your callsign at [aprs.do/passcode](https://aprs.do/passcode). As you type, the characters will not be visible on screen (it is treated like a password for security).
+Enter your APRS-IS passcode — the 4–5 digit number you calculated from your callsign at [apps.magicbug.co.uk/passcode](https://apps.magicbug.co.uk/passcode/). As you type, the characters will not be visible on screen (it is treated like a password for security).
 
 **Example entry:** `12345`
 
@@ -464,7 +464,7 @@ If you do not see your position:
    https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/YOUR_FEED_ID/message.json
    ```
    Replace `YOUR_FEED_ID` with your actual Feed ID. You should see JSON data including your coordinates.
-4. Check your APRS-IS passcode at [aprs.do/passcode](https://aprs.do/passcode)
+4. Check your APRS-IS passcode at [apps.magicbug.co.uk/passcode](https://apps.magicbug.co.uk/passcode/)
 
 ---
 
@@ -549,7 +549,7 @@ No external libraries beyond `requests` are required. The `requests` library is 
 ## Troubleshooting
 
 **`APRS-IS rejected login — check callsign and passcode`**
-Your passcode does not match your callsign. Recalculate it at [aprs.do/passcode](https://aprs.do/passcode) and re-enter it with `--reset`.
+Your passcode does not match your callsign. Recalculate it at [apps.magicbug.co.uk/passcode](https://apps.magicbug.co.uk/passcode/) and re-enter it with `--reset`.
 
 **`SPOT API returned HTTP 403` or `HTTP 401`**
 Your Feed ID is wrong, or Shared Page is not enabled for your device on findmespot.com.
