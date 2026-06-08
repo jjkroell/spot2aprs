@@ -183,48 +183,37 @@ This is useful if your SPOT device has been turned off or is indoors and not get
 
 ---
 
-```
-APRS symbol — common choices:
-  /j  →  Jeep
-  /k  →  Truck
-  /c  →  Canoe
-  \Y  →  Yacht / Sailboat
-  /s  →  Boat / Ship
-  /'  →  Small Aircraft
-  /^  →  Large Aircraft
-  /[  →  Person (Walker)
-  /b  →  Bicycle
-  /-  →  House / Fixed station
-  /g  →  Glider
+The script now asks you to pick a map icon for your station. APRS icons are defined by two characters entered at two separate prompts — decide which icon you want from the table below first, then you'll enter each character one at a time.
 
+| Symbol | Icon | Table character | Code character |
+|--------|------|:-:|:-:|
+| `/j` | Jeep (default) | `/` | `j` |
+| `/k` | Truck | `/` | `k` |
+| `/c` | Canoe | `/` | `c` |
+| `/s` | Boat / Ship | `/` | `s` |
+| `/'` | Small Aircraft | `/` | `'` |
+| `/^` | Large Aircraft | `/` | `^` |
+| `/[` | Person / Walker | `/` | `[` |
+| `/b` | Bicycle | `/` | `b` |
+| `/-` | House / Fixed station | `/` | `-` |
+| `/g` | Glider | `/` | `g` |
+| `\Y` | Yacht / Sailboat | `\` | `Y` |
+
+```
 Symbol table character [/]:
 ```
 
-APRS uses two characters to define which icon appears on the map for your station. The first character is the **symbol table** — either `/` (primary table) or `\` (alternate table). Press **Enter** to accept `/`, which covers most common symbols.
-
-**Example entry:** `/` (press Enter for default)
+Enter the **table character** from the left column of your chosen row above — either `/` or `\`. Almost all common symbols use `/`. Press **Enter** to accept the default `/`.
 
 ```
 Symbol code character [j]:
 ```
 
-The second character picks the specific icon from the table you chose. Using the primary table `/`:
+Enter the **code character** from the right column of your chosen row. Press **Enter** to accept the default `j` (Jeep).
 
-| Code | Icon |
-|------|------|
-| `j` | Jeep (default — good general-purpose vehicle) |
-| `k` | Truck |
-| `c` | Canoe |
-| `s` | Boat / Ship |
-| `'` | Small Aircraft |
-| `[` | Person / Walker |
-| `b` | Bicycle |
-| `-` | House / Fixed station |
-| `g` | Glider |
+**Example — Truck:** enter `/` at the first prompt, then `k` at the second.
 
-**Example entry:** `j` (press Enter for default Jeep) or `k` for a truck, etc.
-
-> To use alternate table symbols like `\Y` (Sailboat): enter `\` for the table and `Y` for the code.
+**Example — Sailboat:** enter `\` at the first prompt, then `Y` at the second.
 
 ---
 
