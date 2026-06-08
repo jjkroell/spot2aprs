@@ -150,7 +150,7 @@ Enter your amateur radio callsign followed by an **SSID** (Secondary Station Ide
 ---
 
 ```
-APRS-IS passcode  (apps.magicbug.co.uk/passcode):
+APRS-IS passcode:
 ```
 
 Enter your APRS-IS passcode — the 4–5 digit number you calculated from your callsign at [apps.magicbug.co.uk/passcode](https://apps.magicbug.co.uk/passcode/). As you type, the characters will not be visible on screen (it is treated like a password for security).

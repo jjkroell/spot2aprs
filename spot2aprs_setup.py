@@ -208,7 +208,7 @@ def setup_wizard(cfg):
     cfg["spot_feed_id"]  = ask("SPOT Feed ID", cfg.get("spot_feed_id"))
     cfg["callsign"]      = ask("APRS callsign with SSID (e.g. VE7XX-9)",
                                 cfg.get("callsign")).upper()
-    cfg["aprs_passcode"] = ask("APRS-IS passcode  (aprs.do/passcode)",
+    cfg["aprs_passcode"] = ask("APRS-IS passcode",
                                 cfg.get("aprs_passcode"), secret=True, cast=int)
     cfg["interval"]      = ask(
         f"Poll interval in minutes (min {MIN_INTERVAL}, SPOT allows max every 2.5 min)",
