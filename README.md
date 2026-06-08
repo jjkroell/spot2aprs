@@ -169,6 +169,8 @@ How often (in minutes) the script should check your SPOT device for a new positi
 
 **Example entry:** `5` (poll every 5 minutes) or press Enter for the default of `10`
 
+---
+
 ```
 Skip upload if position is older than X minutes [60]:
 ```
@@ -223,6 +225,8 @@ The second character picks the specific icon from the table you chose. Using the
 **Example entry:** `j` (press Enter for default Jeep) or `k` for a truck, etc.
 
 > To use alternate table symbols like `\Y` (Sailboat): enter `\` for the table and `Y` for the code.
+
+---
 
 ```
 Extra comment text (optional, press Enter to skip) []:
