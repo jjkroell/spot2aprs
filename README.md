@@ -189,15 +189,14 @@ The script now asks you to pick a map icon for your station. APRS icons are defi
 |--------|------|:-:|:-:|
 | `/j` | Jeep (default) | `/` | `j` |
 | `/k` | Truck | `/` | `k` |
-| `/c` | Canoe | `/` | `c` |
+| `/[` | Person / Walker | `/` | `[` |
 | `/s` | Boat / Ship | `/` | `s` |
 | `/'` | Small Aircraft | `/` | `'` |
-| `/^` | Large Aircraft | `/` | `^` |
-| `/[` | Person / Walker | `/` | `[` |
-| `/b` | Bicycle | `/` | `b` |
 | `/-` | House / Fixed station | `/` | `-` |
-| `/g` | Glider | `/` | `g` |
 | `\Y` | Yacht / Sailboat | `\` | `Y` |
+| `\u` | SUV / 4x4 | `\` | `u` |
+| `\H` | Helicopter | `\` | `H` |
+| `\O` | Balloon | `\` | `O` |
 
 ```
 Symbol table character [/]:
