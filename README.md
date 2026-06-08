@@ -131,7 +131,7 @@ This is the intro screen. It reminds you where to find your Feed ID.
 SPOT Feed ID:
 ```
 
-Enter your SPOT Feed ID from your findmespot.com account (see *What you need* above). It is a long alphanumeric string.
+Enter your SPOT Feed ID from your findmespot.com account, it is a long alphanumeric string.
 
 **Example entry:** `0onlL1MpojDLSzlNpNYRMHuqcMkIl1234`
 
