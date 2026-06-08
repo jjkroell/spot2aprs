@@ -183,7 +183,7 @@ This is useful if your SPOT device has been turned off or is indoors and not get
 
 ---
 
-The script now asks you to pick a map icon for your station. APRS icons are defined by two characters entered at two separate prompts — decide which icon you want from the table below first, then you'll enter each character one at a time.
+The script now asks you to pick a map icon for your station. APRS icons are defined by two characters entered at two separate prompts — decide which icon you want from the table below first, then you'll enter each character one at a time. A full list of all available symbols is at [aprs.org/symbols.html](http://www.aprs.org/symbols.html).
 
 | Symbol | Icon | Table character | Code character |
 |--------|------|:-:|:-:|
