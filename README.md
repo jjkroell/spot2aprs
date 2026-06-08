@@ -570,4 +570,4 @@ Check your `--log` output to see if recent polls are showing `skipped (too old)`
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+GPL v3 — see [LICENSE](LICENSE)
