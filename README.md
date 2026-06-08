@@ -125,8 +125,6 @@ SPOT Feed ID: log in to findmespot.com →
 
 This is the intro screen. It reminds you where to find your Feed ID.
 
----
-
 ```
 SPOT Feed ID:
 ```
@@ -146,8 +144,6 @@ Enter your amateur radio callsign followed by an **SSID** (Secondary Station Ide
 **Example entry:** `VE7XX-9`
 
 > Always include the SSID (e.g. `-9`). If you only enter `VE7XX` without an SSID the script will accept it, but `-9` is the right convention for a tracker.
-
----
 
 ```
 APRS-IS passcode:
@@ -172,8 +168,6 @@ How often (in minutes) the script should check your SPOT device for a new positi
 - A value of **5–10 minutes** is recommended for most uses.
 
 **Example entry:** `5` (poll every 5 minutes) or press Enter for the default of `10`
-
----
 
 ```
 Skip upload if position is older than X minutes [60]:
@@ -208,8 +202,6 @@ APRS uses two characters to define which icon appears on the map for your statio
 
 **Example entry:** `/` (press Enter for default)
 
----
-
 ```
 Symbol code character [j]:
 ```
@@ -231,8 +223,6 @@ The second character picks the specific icon from the table you chose. Using the
 **Example entry:** `j` (press Enter for default Jeep) or `k` for a truck, etc.
 
 > To use alternate table symbols like `\Y` (Sailboat): enter `\` for the table and `Y` for the code.
-
----
 
 ```
 Extra comment text (optional, press Enter to skip) []:
