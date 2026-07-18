@@ -5,6 +5,11 @@ Automatically upload your SPOT tracker's GPS position to [APRS-IS](https://www.a
 The script polls your SPOT device's public feed on a schedule you choose, converts the GPS coordinates into an APRS packet, and uploads it to the global APRS network. It runs continuously in the background, keeps a local history log, and can be installed as a persistent service so it starts automatically after a reboot — no manual intervention needed.
 
 ---
+Video review here thanks to VE7VU - Thanks for putting this together!
+
+https://youtu.be/k9UfjikZZIc?si=UYpXAkiABaty7xcq
+
+---
 
 ## What you need before you start
 
